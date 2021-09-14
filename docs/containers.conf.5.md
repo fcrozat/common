@@ -1,4 +1,4 @@
-% containers.conf(5) Container engine configuration file
+% containers.conf 5 Container engine configuration file
 
 # NAME
 containers.conf - The container engine configuration file specifies default
@@ -279,9 +279,20 @@ Options are:
 The `network` table contains settings pertaining to the management of CNI
 plugins.
 
-**cni_plugin_dirs**=["/opt/cni/bin/",]
+**cni_plugin_dirs**=[]
 
 List of paths to directories where CNI plugin binaries are located.
+
+The default list is:
+```
+cni_plugin_dirs = [
+  "/usr/local/libexec/cni",
+  "/usr/libexec/cni",
+  "/usr/local/lib/cni",
+  "/usr/lib/cni",
+  "/opt/cni/bin",
+]
+```
 
 **default_network**="podman"
 
@@ -367,6 +378,29 @@ if you want to set environment variables for the container.
 Default method to use when logging events.
 Valid values: `file`, `journald`, and `none`.
 
+**helper_binaries_dir**=["/usr/libexec/podman", ...]
+
+A is a list of directories which are used to search for helper binaries.
+
+The default paths on Linux are:
+- `/usr/local/libexec/podman`
+- `/usr/local/lib/podman`
+- `/usr/libexec/podman`
+- `/usr/lib/podman`
+
+The default paths on macOS are:
+- `/usr/local/opt/podman/libexec`
+-	`/opt/homebrew/bin`
+-	`/opt/homebrew/opt/podman/libexec`
+- `/usr/local/bin`
+-	`/usr/local/libexec/podman`
+-	`/usr/local/lib/podman`
+-	`/usr/libexec/podman`
+-	`/usr/lib/podman`
+
+The default path on Windows is:
+- `C:\Program Files\RedHat\Podman`
+
 **hooks_dir**=["/etc/containers/oci/hooks.d", ...]
 
 Path to the OCI hooks directories for automatically executed hooks.
@@ -411,6 +445,11 @@ change the lock type.
 Indicates if Podman is running inside a VM via Podman Machine.
 Podman uses this value to do extra setup around networking from the
 container inside the VM to to host.
+
+**machine_image**="testing"
+
+Default image used when creating a new VM using `podman machine init`.
+Options: `testing`, `stable`, or a custom path or download URL to an image
 
 **multi_image_archive**=false
 
@@ -474,6 +513,14 @@ The list of OCI runtimes that support running containers with KVM separation.
 **runtime_supports_nocgroups**=["crun", "krun"]
 
 The list of OCI runtimes that support running containers without CGroups.
+
+**image_copy_tmp_dir**="/var/tmp"
+
+Default location for storing temporary container image content.  Can be
+overridden with the TMPDIR environment variable.  If you specify "storage", then
+the location of the container/storage tmp directory will be used. If set then it
+is the users responsibility to cleanup storage. Configure tmpfiles.d(5) to
+cleanup storage.
 
 **static_dir**="/var/lib/containers/storage/libpod"
 
@@ -570,6 +617,6 @@ is used for the storage.conf file rather than the default.
 This is primarily used for testing.
 
 # SEE ALSO
-containers-storage.conf(5), containers-policy.json(5), containers-registries.conf(5)
+containers-storage.conf(5), containers-policy.json(5), containers-registries.conf(5), tmpfiles.d(5)
 
 [toml]: https://github.com/toml-lang/toml

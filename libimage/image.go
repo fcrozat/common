@@ -74,7 +74,10 @@ func (i *Image) isCorrupted(name string) error {
 	}
 
 	if _, err := ref.NewImage(context.Background(), nil); err != nil {
-		return errors.Errorf("Image %s exists in local storage but may be corrupted: %v", name, err)
+		if name == "" {
+			name = i.ID()[:12]
+		}
+		return errors.Errorf("Image %s exists in local storage but may be corrupted (remove the image to resolve the issue): %v", name, err)
 	}
 	return nil
 }
@@ -499,9 +502,15 @@ func (i *Image) Untag(name string) error {
 		return errors.Wrapf(err, "error normalizing name %q", name)
 	}
 
-	if _, isDigested := ref.(reference.Digested); isDigested {
-		return errors.Wrap(errUntagDigest, name)
-	}
+	// FIXME: this is breaking Podman CI but must be re-enabled once
+	// c/storage supports alterting the digests of an image.  Then,
+	// Podman will do the right thing.
+	//
+	// !!! Also make sure to re-enable the tests !!!
+	//
+	//	if _, isDigested := ref.(reference.Digested); isDigested {
+	//		return errors.Wrap(errUntagDigest, name)
+	//	}
 
 	name = ref.String()
 
